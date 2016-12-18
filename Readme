@@ -1,26 +1,28 @@
 ###mqtt
+
 本项目的目的是实现一个分布式的mqtt服务器
 
 ＊ golang实现
+*  服务器的消息转发
 ＊ 高可靠性，保障消息的丢失
 ＊ 分布式
 
 
-
-mqtt ---->  connect ----> server
-            connack
-
-            建立Session， Session的关系， client_id -> connection
-            							问题，多长时间会失去连接
-            循环：
-            	while {
-            		receive msg
-            		process msg
-            	}
-
-           	订阅消息，------- 
-           	广播消息
-		   
-
-
 struct go lang parse message 
+
+### 任务分解
+* 构建connect connack 消息
+* 验证消息
+1. protocal name
+2. protocol level
+3. connect flags
+4. keep alive
+5. 标记位处理 usename, pasword, will retain, will qos,will flag, clean session,reserved
+6. 
+
+
+* 实现connect and connack功能
+* 增加验证
+* 实现QOS1 pub
+
+### 任务分解
