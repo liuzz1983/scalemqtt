@@ -38,6 +38,13 @@ type ConnAckMessage struct {
 	retCode byte
 }
 
+// NewConnAckMessage create new conn message
+func NewConnAckMessage() *ConnAckMessage {
+	connAck := &ConnAckMessage{}
+	connAck.SetMessageType(CONNACK)
+	return connAck
+}
+
 //IsSessionPresent return whether the session is existing
 func (ack *ConnAckMessage) IsSessionPresent() bool {
 	return ack.flag&0x1 == 0x1
@@ -49,10 +56,6 @@ func (ack *ConnAckMessage) SetSessionPresent(v bool) {
 	} else {
 		ack.flag &= 0xfe
 	}
-}
-
-func (ack *ConnAckMessage) MessageType() byte {
-	return CONNACK
 }
 
 func (ack *ConnAckMessage) MessageLen() int {

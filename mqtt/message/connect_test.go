@@ -3,6 +3,8 @@ package message
 import (
 	"testing"
 
+	"fmt"
+
 	"github.com/stretchr/testify/assert"
 )
 
@@ -37,8 +39,20 @@ func TestConnectMessageFlag(t *testing.T) {
 }
 
 func TestConnectMessageEncoding(t *testing.T) {
-	conn := &ConnMessage{}
+	conn := NewConnMessage()
 	clientID := []byte("0234448888333")
 	conn.SetClientID(clientID)
+	conn.SetUser([]byte("liuzhenzhong"), []byte("12344"))
 
+	totalLen := conn.headerLen() + conn.msgLen()
+	buf := make([]byte, totalLen)
+
+	encodeLen, err := conn.Encode(buf)
+	assert.NoError(t, err, "should not have error in encoding")
+	fmt.Printf("%v \n", buf)
+
+	conn2 := &ConnMessage{}
+	decodeLen, err := conn2.Decode(buf)
+	assert.NoError(t, err, "should not return error")
+	assert.Equal(t, encodeLen, decodeLen, "message should be equal")
 }

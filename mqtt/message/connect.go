@@ -1,6 +1,8 @@
 package message
 
-import "errors"
+import (
+	"errors"
+)
 
 // Connection message Variable header:
 // Protocol Name 1-6
@@ -34,10 +36,22 @@ type ConnMessage struct {
 	PassWord    []byte
 }
 
+//NewConnMessage  create new conn message
+func NewConnMessage() *ConnMessage {
+	conn := &ConnMessage{}
+	conn.SetMessageType(CONNECT)
+	conn.ProtoName = []byte("MQTT")
+	conn.ProtoLevel = 0x4
+
+	return conn
+}
+
 // Encode encode connect message into network bytes
 func (msg *ConnMessage) Encode(dst []byte) (int, error) {
 	n, index := 0, 0
-	totalLen := msg.headerLen() + msg.msgLen()
+	msgLen := msg.msgLen()
+	msg.remainLen = uint32(msgLen)
+	totalLen := msg.headerLen() + msgLen
 	if len(dst) < totalLen {
 		return 0, errors.New("not enough space to store message")
 	}
@@ -53,18 +67,12 @@ func (msg *ConnMessage) Encode(dst []byte) (int, error) {
 		return index, err
 	}
 	index += n
-
 	return index, nil
 
 }
 
 func (msg *ConnMessage) encodeMsg(dest []byte) (int, error) {
 	n, index := 0, 0
-	msgLen := msg.msgLen()
-	if len(dest) < msgLen {
-		return 0, errors.New("not enough space to contain the msg")
-	}
-
 	n, err := writeLPBytes(dest[index:], msg.ProtoName)
 	if err != nil {
 		return index, err
@@ -127,7 +135,6 @@ func (msg *ConnMessage) msgLen() int {
 
 	// msg length for fixed part
 	msgLen := 10
-
 	// client id
 	msgLen += 2
 	if msg.clientID != nil {
@@ -169,20 +176,21 @@ func (msg *ConnMessage) Version() byte {
 
 // Decode decode connect message
 func (msg *ConnMessage) Decode(buf []byte) (int, error) {
-
-	index, err := msg.decodeHeader(buf)
+	index := 0
+	n, err := msg.decodeHeader(buf)
 	if err != nil {
 		return 0, err
 	}
+	index += n
 
-	// begin to parse remain length
-	remainMsg := buf[index:]
-	// connection msg length is 9 byte
-	if len(remainMsg) != 9 {
-		return index, errors.New("wrong msg buf length")
+	if msg.remainLen > uint32(len(buf[index:])) {
+		return 0, errors.New("wrong message content to decode")
 	}
-
-	//fmt.Println(len)
+	n, err = msg.decodeMsg(buf[index:])
+	if err != nil {
+		return index, err
+	}
+	index += n
 	return index, nil
 }
 
@@ -195,6 +203,7 @@ func (msg *ConnMessage) decodeMsg(buf []byte) (int, error) {
 	if err != nil {
 		return n, err
 	}
+
 	index += n
 
 	msg.ProtoLevel = buf[index]
@@ -270,6 +279,26 @@ func (msg *ConnMessage) SetPasswordFlag(v bool) {
 	} else {
 		msg.ConnectFlag &= 0xbf
 	}
+}
+
+//
+func (msg *ConnMessage) SetPassword(password []byte) {
+	msg.PassWord = password
+	msg.SetPasswordFlag(true)
+}
+
+//SetUserName add user name
+func (msg *ConnMessage) SetUserName(name []byte) {
+	msg.UserName = name
+	msg.SetUserFlag(true)
+}
+
+//SetUser set user name and password
+func (msg *ConnMessage) SetUser(name []byte, password []byte) {
+	msg.PassWord = password
+	msg.SetPasswordFlag(true)
+	msg.UserName = name
+	msg.SetUserFlag(true)
 }
 
 // IsWillRetain wether the will retain flag is set
