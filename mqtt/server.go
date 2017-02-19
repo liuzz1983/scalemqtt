@@ -25,6 +25,7 @@ type Server struct {
 }
 
 // NewServer create new server
+// listen on socket to receive message
 func NewServer(config *ServerConfig) (*Server, error) {
 	server := &Server{
 		address:        config.Address,

@@ -16,3 +16,4 @@ func (this *Session) Init(msg *message.ConnectMessage) error {
 func (this *Session) Update(msg *message.ConnectMessage) error {
 	return nil
 }
+

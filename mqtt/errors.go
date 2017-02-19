@@ -5,7 +5,7 @@ import (
 )
 
 var (
-	errDisconnect = errors.New("Disconnect")
-	errMsgFormat  = errors.New("WrongMsgFormat")
-	errMsgSize    = errors.New("WrongMsgSize")
+	ErrDisconnect = errors.New("Disconnect")
+	ErrMsgFormat  = errors.New("WrongMsgFormat")
+	ErrMsgSize    = errors.New("WrongMsgSize")
 )

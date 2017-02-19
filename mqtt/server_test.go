@@ -10,7 +10,7 @@ import (
 
 func TestReadConnectMessage(t *testing.T) {
 	msg := message.NewConnectMessage()
-	// Set the appropriate parameters
+	// Set the appropriate paramgeters
 	msg.SetWillQos(1)
 	msg.SetVersion(4)
 	msg.SetCleanSession(true)

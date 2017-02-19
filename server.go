@@ -2,9 +2,11 @@ package main
 
 import (
 	"fmt"
-	"github.com/surgemq/message"
 	"net"
 	"time"
+
+	_ "github.com/Sirupsen/logrus"
+	"github.com/surgemq/message"
 )
 
 type Server struct {
@@ -16,6 +18,7 @@ type Server struct {
 	sessMgr *SessionManager
 }
 
+// main
 func NewServer(address string) (*Server, error) {
 	server := &Server{
 		address: address,

@@ -2,10 +2,11 @@ package mqtt
 
 import (
 	"encoding/binary"
-	"github.com/surgemq/message"
 	"io"
 	"net"
 	"time"
+
+	"github.com/surgemq/message"
 )
 
 type netReader interface {
@@ -47,7 +48,7 @@ func WriteMessage(msg message.Message, writer io.Writer) (int, error) {
 	}
 
 	if msgLen != length {
-		return 0, errMsgSize
+		return 0, ErrMsgSize
 	}
 
 	var totalLen = 0
@@ -139,7 +140,7 @@ func ReadMessage(conn io.Reader) ([]byte, error) {
 
 		//control the msg length
 		if len(buf) >= 5 {
-			return nil, errMsgFormat
+			return nil, ErrMsgFormat
 		}
 
 	}
